@@ -26,3 +26,6 @@ podra ver como el codigo que esta en el archivo ejemplo1.tiny se agrupa e identi
 
 
 
+
+OMAR MARTINEZ GARCIA COMPILADORES
+MORALES JIMENEZ OLIVER
