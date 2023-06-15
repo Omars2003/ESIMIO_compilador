@@ -14,8 +14,8 @@ WHILE b < a REPEAT
     LET b = b + 1
 ENDWHILE
 
-PRINT "Average: "
+PRINT "promedio: "
 PRINT s / a
 
-PRINT "Average: "
+PRINT "promedio: "
 PRINT s / a
