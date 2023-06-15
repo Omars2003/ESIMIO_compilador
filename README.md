@@ -33,7 +33,7 @@ Como se vio en clase un compilador es capaz de ejecutarse de diferentes maneras 
 
 
 # 5.-Escriba el siguiente comando:
-Para poder   automatizar y controlar el proceso de compilación y construcción del proyecto, creamos un script de construcción, que hara mas facil la creacion del codigo objeto.
+Para poder   automatizar y controlar el proceso de compilación y construcción del proyecto, creamos un script de construcción, que hara mas facil la creación del código objeto.
 
 para poder comprobar que el Compilador ha tenido exito, generaremos el codigo objeto en c de cualquiera de nuestros programas como ejemplo.
 ![image](https://github.com/Omars2003/ESIMIO_compilador/assets/91102881/5d952630-180b-45f2-9c22-215473c399fd)
