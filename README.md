@@ -49,5 +49,6 @@ Si tiene alguna duda, mandarnos mensaje a nuestros correos electronicos
 
 
  COMPILADORES
-OMAR MARTINEZ GARCIA   omar.paps3012003@gmail.co 
-MORALES JIMENEZ OLIVER
+OMAR MARTINEZ GARCIA   omar.paps3012003@gmail.com
+
+MORALES JIMENEZ OLIVER  mjo.21.tm@gmail.com
