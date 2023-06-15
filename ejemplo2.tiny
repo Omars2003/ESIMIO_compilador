@@ -1,23 +1,23 @@
-# Compute average of given values.
+# Calcular el promedio de los valores dados
 
 LET a = 0
 WHILE a < 1 REPEAT
-    PRINT "Enter number of scores: "
+    PRINT "ingresa los valores: "
     INPUT a
 ENDWHILE
 
 LET b = 0
 LET s = 0
-PRINT "Enter one value at a time: "
+PRINT "uno a la vez: "
 WHILE b < a REPEAT
     INPUT c
     LET s = s + c
     LET b = b + 1
 ENDWHILE
 
-PRINT "Average: "
+PRINT "promedio: "
 PRINT s / a
 
 
-PRINT "Average: "
+PRINT "promedio: "
 PRINT s / a
