@@ -2,9 +2,13 @@
 compilador c++
 En este repertorio encontrara el compilador completo, 
 el Archivo CompiladorMx.py es el main, que verifica que haya un archivo fuente como entrada, lee el archivo y lo pasar por el archivo lex(lexer) que se encarga de generar tokens, posterior a eso los tokens se pasan al archivo parser.py para que los analize sintacticamente de acuerdo a la gramtica(grammar.txt) y asi genera un árbol de desiciones de manera estructurada y con sentido.
-La ultimas 3 fases se basaron en generación de codigo intermedio, optimización y codigo objeto.
+
+La ultimas 3 fases se basaron en generación de codigo intermedio, optimización y codigo objeto, por medio de un programa emit.py y por medio de un script de construcción.
 
 Como se vio en clase un compilador es capaz de ejecutarse de diferentes maneras de acuerdo a la computadora en la que se esta trabajando y las aplicaciones que ella tiene para poder realizar con exito la compilación, a continuación encontrara dos maneras de poder probar el compilador y generar codigo en c, por lo que nuestra mejor opción es abrirlo en en un Github Codespaces, que es un entorno de desarrollo en la nube proporcionado por GitHub. Permite a los desarrolladores crear y acceder a un entorno de desarrollo completo y personalizado directamente desde el navegador web o desde su editor de código preferido, asi ya tendra todas las dependencias que nosotros como desarrolladores ocupamos.
+
+
+
  
  
  Para probar el compilador realize los siguientes pasos:
@@ -36,11 +40,14 @@ para poder comprobar que el Compilador ha tenido exito, generaremos el codigo ob
 
 # 6.- Una vez escirtos los comandos anteriores podra ver un nuevo archivo .c para  ejemplo2.tiny, confirmando que ha tenido exito.
 
+![image](https://github.com/Omars2003/ESIMIO_compilador/assets/91102881/0b000ea0-25ad-45ea-b4f0-f8e17a95d5d6)
 
 
 
+Si tiene alguna duda, mandarnos mensaje a nuestros correos electronicos
 
 
 
-OMAR MARTINEZ GARCIA COMPILADORES
+ COMPILADORES
+OMAR MARTINEZ GARCIA   omar.paps3012003@gmail.co 
 MORALES JIMENEZ OLIVER
