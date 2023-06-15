@@ -1,7 +1,10 @@
 ## Esimio_compilador
 compilador c++
-En este repertorio encontrara las primeras 3 fases del compilador.
+En este repertorio encontrara el compilador completo, 
 el Archivo CompiladorMx.py es el main, que verifica que haya un archivo fuente como entrada, lee el archivo y lo pasar por el archivo lex(lexer) que se encarga de generar tokens, posterior a eso los tokens se pasan al archivo parser.py para que los analize sintacticamente de acuerdo a la gramtica(grammar.txt) y asi genera un árbol de desiciones de manera estructurada y con sentido.
+La ultimas 3 fases se basaron en generación de codigo intermedio, optimización y codigo objeto.
+
+Como se vio en clase un compilador es capaz de ejecutarse de diferentes maneras de acuerdo a la computadora en la que se esta trabajando y las aplicaciones que ella tiene para poder realizar con exito la compilación, a continuación encontrara dos maneras de poder probar el compilador y generar codigo en c.
  
  
  Para probar el compilador realize los siguientes pasos:
