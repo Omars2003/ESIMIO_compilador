@@ -1,4 +1,4 @@
-# promedio de valores de entrada
+# Compute average of given values.
 
 LET a = 0
 WHILE a < 1 REPEAT
@@ -14,6 +14,10 @@ WHILE b < a REPEAT
     LET s = s + c
     LET b = b + 1
 ENDWHILE
+
+PRINT "Average: "
+PRINT s / a
+
 
 PRINT "Average: "
 PRINT s / a

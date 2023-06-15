@@ -1,236 +1,261 @@
 import sys
 from lex import *
 
-# FASE 3 ANALISIS SEMANTICO  20/04/2023
-class Parser:
-    def __init__(self, lexer):
-        self.lexer = lexer
 
-        self.symbols = set()    
-        self.labelsDeclared = set() 
-        self.labelsGotoed = set() 
+# El objeto Parser realiza el seguimiento del token actual, verifica si el código coincide con la gramática y emite código a lo largo del proceso.
+class Parser:
+    def __init__(self, lexer, emitter):
+        self.lexer = lexer
+        self.emitter = emitter
+
+        self.symbols = set()  # Todas las variables declaradas hasta ahora.
+        self.labelsDeclared = set()  # Mantener un registro de todas las etiquetas declaradas.
+        self.labelsGotoed = set()  # Todas las etiquetas a las que se hace "goto", para saber si existen o no.
 
         self.curToken = None
         self.peekToken = None
         self.nextToken()
-        self.nextToken()   
+        self.nextToken()  # Llamarlo dos veces para inicializar el token actual y el token siguiente.
 
-   
+    # Devuelve verdadero si el token actual coincide.
     def checkToken(self, kind):
         return kind == self.curToken.kind
 
-   
+    # Devuelve verdadero si el siguiente token coincide.
     def checkPeek(self, kind):
         return kind == self.peekToken.kind
 
+    # Intenta hacer coincidir el token actual. Si no lo consigue, muestra un error. Avanza al token actual.
     def match(self, kind):
         if not self.checkToken(kind):
-            self.abort("se esperaba " + kind.name + ", got " + self.curToken.kind.name)
+            self.abort("Se esperaba " + kind.name + ", se obtuvo " + self.curToken.kind.name)
         self.nextToken()
 
-   
+    # Avanza al siguiente token.
     def nextToken(self):
         self.curToken = self.peekToken
         self.peekToken = self.lexer.getToken()
-        
+        # No es necesario preocuparse por pasar el final de archivo (EOF), el analizador léxico se encarga de eso.
 
-  
+    # Devuelve verdadero si el token actual es un operador de comparación.
     def isComparisonOperator(self):
-        return self.checkToken(TokenType.GT) or self.checkToken(TokenType.GTEQ) or self.checkToken(TokenType.LT) or self.checkToken(TokenType.LTEQ) or self.checkToken(TokenType.EQEQ) or self.checkToken(TokenType.NOTEQ)
+        return (
+            self.checkToken(TokenType.GT)
+            or self.checkToken(TokenType.GTEQ)
+            or self.checkToken(TokenType.LT)
+            or self.checkToken(TokenType.LTEQ)
+            or self.checkToken(TokenType.EQEQ)
+            or self.checkToken(TokenType.NOTEQ)
+        )
 
     def abort(self, message):
-        sys.exit("Error. " + message)
+        sys.exit("¡Error! " + message)
 
+    # Reglas de producción.
 
-   
-
-  
+    # program ::= {statement}
+        # program ::= {statement}
     def program(self):
-        print("PROGRAMA")
-
-       
+        self.emitter.headerLine("#include <stdio.h>")
+        self.emitter.headerLine("int main(void){")
+        
+        # Since some newlines are required in our grammar, need to skip the excess.
         while self.checkToken(TokenType.NEWLINE):
             self.nextToken()
 
-       
+        # Parse all the statements in the program.
         while not self.checkToken(TokenType.EOF):
             self.statement()
 
-      
+        # Wrap things up.
+        self.emitter.emitLine("return 0;")
+        self.emitter.emitLine("}")
+
+        # Check that each label referenced in a GOTO is declared.
         for label in self.labelsGotoed:
             if label not in self.labelsDeclared:
-                self.abort("NO DECLARADO: " + label)
+                self.abort("Attempting to GOTO to undeclared label: " + label)
 
-
+    # Una de las siguientes declaraciones...
     def statement(self):
-       
+        # Verifica el primer token para determinar qué tipo de declaración es.
 
-        
+        # "PRINT" (expression | string)
         if self.checkToken(TokenType.PRINT):
-            print("DECLARACION-PRINT")
             self.nextToken()
 
             if self.checkToken(TokenType.STRING):
-               
+                # Es una cadena simple, así que se imprime.
+                self.emitter.emitLine('printf("' + self.curToken.text + '\\n");')
                 self.nextToken()
 
             else:
-              
+                # Se espera una expresión y se imprime el resultado como un número de punto flotante.
+                self.emitter.emit('printf("%' + '.2f\\n", (float)(')
                 self.expression()
+                self.emitter.emitLine('));')
 
-       
+        # "IF" comparison "THEN" block "ENDIF"
         elif self.checkToken(TokenType.IF):
-            print("DECLARACION-IF")
             self.nextToken()
+            self.emitter.emit("if (")
             self.comparison()
 
             self.match(TokenType.THEN)
             self.nl()
+            self.emitter.emitLine(") {")
 
-        
+            # Cero o más declaraciones en el cuerpo.
             while not self.checkToken(TokenType.ENDIF):
                 self.statement()
 
             self.match(TokenType.ENDIF)
+            self.emitter.emitLine("}")
 
-     
+        # "WHILE" comparison "REPEAT" block "ENDWHILE"
         elif self.checkToken(TokenType.WHILE):
-            print("DECLARACION-WHILE")
             self.nextToken()
+            self.emitter.emit("while (")
             self.comparison()
 
             self.match(TokenType.REPEAT)
             self.nl()
+            self.emitter.emitLine(") {")
 
-      
+            # Cero o más declaraciones en el cuerpo del bucle.
             while not self.checkToken(TokenType.ENDWHILE):
                 self.statement()
 
             self.match(TokenType.ENDWHILE)
+            self.emitter.emitLine("}")
 
-    
+        # "LABEL" ident
         elif self.checkToken(TokenType.LABEL):
-            print("DECLARACION-LABEL")
             self.nextToken()
 
-           
+            # Asegurarse de que esta etiqueta no exista ya.
             if self.curToken.text in self.labelsDeclared:
-                self.abort("YA EXSITE: " + self.curToken.text)
+                self.abort("La etiqueta ya existe: " + self.curToken.text)
             self.labelsDeclared.add(self.curToken.text)
 
+            self.emitter.emitLine(self.curToken.text + ":")
             self.match(TokenType.IDENT)
 
-       
+        # "GOTO" ident
         elif self.checkToken(TokenType.GOTO):
-            print("DECLARACION-GOTO")
             self.nextToken()
             self.labelsGotoed.add(self.curToken.text)
+            self.emitter.emitLine("goto " + self.curToken.text + ";")
             self.match(TokenType.IDENT)
 
-    
+        # "LET" ident = expression
         elif self.checkToken(TokenType.LET):
-            print("DECLARACION-LET")
             self.nextToken()
 
-           
+            # Comprobar si la ident ya existe en la tabla de símbolos. Si no existe, se declara.
             if self.curToken.text not in self.symbols:
                 self.symbols.add(self.curToken.text)
+                self.emitter.headerLine("float " + self.curToken.text + ";")
 
+            self.emitter.emit(self.curToken.text + " = ")
             self.match(TokenType.IDENT)
             self.match(TokenType.EQ)
-            
-            self.expression()
 
-      
+            self.expression()
+            self.emitter.emitLine(";")
+
+        # "INPUT" ident
         elif self.checkToken(TokenType.INPUT):
-            print("DECLARACION- INPUT")
             self.nextToken()
 
-           
+            # Si la variable no existe, se declara.
             if self.curToken.text not in self.symbols:
                 self.symbols.add(self.curToken.text)
+                self.emitter.headerLine("float " + self.curToken.text + ";")
 
+            # Emitir scanf pero también validar la entrada. Si es inválida, se establece la variable en 0 y se limpia la entrada.
+            self.emitter.emitLine(
+                'if (0 == scanf("%f", &' + self.curToken.text + ')) {'
+            )
+            self.emitter.emitLine(self.curToken.text + " = 0;")
+            self.emitter.emit('scanf("%')
+            self.emitter.emitLine('*s");')
+            self.emitter.emitLine("}")
             self.match(TokenType.IDENT)
 
-      
+        # ¡Esto no es una declaración válida! ¡Error!
         else:
-            self.abort("DECLARACION INVALIDA EN" + self.curToken.text + " (" + self.curToken.kind.name + ")")
+            self.abort(
+                "Declaración no válida en " + self.curToken.text + " (" + self.curToken.kind.name + ")"
+            )
 
-      
+        # Nueva línea.
         self.nl()
 
-
-  
+    # comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
     def comparison(self):
-        print("COMPARACION")
-
         self.expression()
-      
+        # compara una expresion con un operador
         if self.isComparisonOperator():
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
             self.expression()
-        else:
-            self.abort("OPERACION DE COMPARACION EN: " + self.curToken.text)
-
-        
+        # 
         while self.isComparisonOperator():
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
             self.expression()
 
 
- 
+    # expression ::= term {( "-" | "+" ) term}
     def expression(self):
-        print("EXPRESION")
-
         self.term()
-
+        
         while self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
             self.term()
 
 
-
+    # term ::= unary {( "/" | "*" ) unary}
     def term(self):
-        print("TERM")
-
         self.unary()
-
+      
         while self.checkToken(TokenType.ASTERISK) or self.checkToken(TokenType.SLASH):
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
             self.unary()
 
 
-
+    # unary ::= ["+" | "-"] primary
     def unary(self):
-        print("UNARY")
-   
+        # Optional unary +/-
         if self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
+            self.emitter.emit(self.curToken.text)
             self.nextToken()        
         self.primary()
 
 
- 
+    # primary ::= number | ident
     def primary(self):
-        print("PRIMARY (" + self.curToken.text + ")")
-
         if self.checkToken(TokenType.NUMBER): 
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
         elif self.checkToken(TokenType.IDENT):
-           
+          
             if self.curToken.text not in self.symbols:
-                self.abort("Variable de referencia antes de la asignación: " + self.curToken.text)
+                self.abort("Referencing variable before assignment: " + self.curToken.text)
 
+            self.emitter.emit(self.curToken.text)
             self.nextToken()
         else:
-         
-            self.abort("token inesperado " + self.curToken.text)
+            # Error!
+            self.abort("Unexpected token at " + self.curToken.text)
 
-    
+    # nl ::= '\n'+
     def nl(self):
-        print("nueva linea")
 
-        
         self.match(TokenType.NEWLINE)
-        
+    
         while self.checkToken(TokenType.NEWLINE):
             self.nextToken()
