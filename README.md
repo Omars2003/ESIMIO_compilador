@@ -17,7 +17,7 @@ Como se vio en clase un compilador es capaz de ejecutarse de diferentes maneras 
  ![image](https://user-images.githubusercontent.com/91102881/234360588-4a9987f6-b2da-4cc2-80c3-b03a48ea484c.png)
  
  # 2.- se le desplegara el siguiente menu: y seleccionamos Codespaces
-![image](https://user-images.githubusercontent.com/91102881/234360843-ba4703f3-12b0-488d-a8b1-2bc8bef19d8c.png)
+
 
  # 3.- Una vez abierto Codespaces seleccionara Crear en Main, recuerda tener una cuenta para poder alojar el software y poder abrir el compilador.
  ![image](https://github.com/Omars2003/ESIMIO_compilador/assets/91102881/f59e6ae0-7ccb-46f0-a888-c26f8de58812)
