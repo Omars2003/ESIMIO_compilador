@@ -129,7 +129,7 @@ class Parser:
             self.match(TokenType.ENDWHILE)
             self.emitter.emitLine("}")
 
-        # "LABEL" ident
+        # "LABEL" identificador
         elif self.checkToken(TokenType.LABEL):
             self.nextToken()
 
@@ -141,14 +141,14 @@ class Parser:
             self.emitter.emitLine(self.curToken.text + ":")
             self.match(TokenType.IDENT)
 
-        # "GOTO" ident
+        # "GOTO" identificador
         elif self.checkToken(TokenType.GOTO):
             self.nextToken()
             self.labelsGotoed.add(self.curToken.text)
             self.emitter.emitLine("goto " + self.curToken.text + ";")
             self.match(TokenType.IDENT)
 
-        # "LET" ident = expression
+        # "LET" identificador = expression
         elif self.checkToken(TokenType.LET):
             self.nextToken()
 
@@ -164,7 +164,7 @@ class Parser:
             self.expression()
             self.emitter.emitLine(";")
 
-        # "INPUT" ident
+        # "INPUT" identiificador
         elif self.checkToken(TokenType.INPUT):
             self.nextToken()
 
